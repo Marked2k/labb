@@ -1,0 +1,116 @@
+#include <iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+#include<vector>
+#include "city.h"
+using namespace std;
+
+/////////////////////
+//  Global Arrays  //
+/////////////////////
+City cityArray[] = { City("Los Angeles", 4000000), City("San Diego", 1500000), City("San Francisco", 900000), City("Sacramento", 500000),
+                  City("Stockton", 300000), City("Redding", 90000), City("Las Vegas", 700000), City("Reno", 300000),
+                  City("Portland", 700000), City("Seattle", 750000), City("Eugene", 200000) };
+
+vector<City> cityVector;
+
+//////////////////////////////////
+//  Globally Defined Functions  //
+//////////////////////////////////
+void initVector(vector<City>& cityVector, City arr[], int varNum)
+{
+    for (int i = 0; i < varNum; i++)
+        cityVector.push_back(arr[i]);
+}
+
+void printCityVector(vector<City>& cityVector)
+{
+    for (auto var1 : cityVector)
+        var1.printInfo();
+}
+
+void mergeCityVector(vector<City>& cityVector, int lowNum, int midNum, int highNum)
+{
+    
+    //Merge(numbers, i, j, k) 
+    int mergedSize = highNum - lowNum + 1;                  // Size of merged partition
+    int mergePos = 0;                                       // Position to insert merged number
+    int leftPos = 0;                                        // Position of elements in left partition
+    int rightPos = 0;                                       // Position of elements in right partition
+    vector<City> mergedNumbers;                             
+
+    leftPos = lowNum;                                       // Initialize left partition position
+    rightPos = midNum + 1;                                  // Initialize right partition position
+   
+    // Add smallest element from left or right partition to mergedNumbers
+    while (leftPos <= midNum && rightPos <= highNum) 
+    {
+        if (cityVector.at(leftPos).getPopulation() <= cityVector.at(rightPos).getPopulation())
+        {
+            mergedNumbers.push_back(cityVector.at(leftPos));
+            ++leftPos;
+        }
+        else 
+        {
+            mergedNumbers.push_back(cityVector.at(rightPos));
+            ++rightPos; 
+        }
+
+    }
+   
+    // If left partition is not empty, add remaining elements to mergedNumbers
+    while (leftPos <= midNum) 
+    {
+        mergedNumbers.push_back(cityVector.at(leftPos));
+        ++leftPos;
+    }
+   
+    // If right partition is not empty, add remaining elements to mergedNumbers
+    while (rightPos <= highNum) 
+    {
+        mergedNumbers.push_back(cityVector.at(rightPos));
+        ++rightPos;
+    }
+   
+    // Copy mergedNumbers number back to cityVector
+    for (mergePos = 0; mergePos < mergedSize; ++mergePos) 
+        cityVector.at(lowNum + mergePos) = mergedNumbers.at(mergePos);
+
+}
+
+void cityMergeSort(vector<City>& cityVector, int lowBound, int highBound)
+{
+    
+    // MergeSort(numbers, i, k) 
+    int j = 0;
+   
+    if (lowBound < highBound) 
+    {
+        j = (lowBound + highBound) / 2;     // Find the midpoint in the partition
+      
+        // Recursively sort left and right partitions
+        cityMergeSort(cityVector, lowBound, j);
+        cityMergeSort(cityVector, j + 1, highBound);
+      
+        // Merge left and right partition in sorted order
+        mergeCityVector(cityVector, lowBound, j, highBound);
+   }
+    
+}
+
+
+int main()
+{
+    initVector(cityVector, cityArray, 11);
+    cout << endl << "Initializing cityVector with cityArray[]" << endl;
+    printCityVector(cityVector);
+
+    int lowNum = 0;
+    int highNum = 10;
+    cityMergeSort(cityVector, lowNum, highNum);
+    cout << endl << "Merge sort on cityVector:" << endl;
+    printCityVector(cityVector);
+
+    return 0;
+}
